@@ -1,0 +1,6 @@
+e:\users\matthew\documents\visual studio 2017\Projects\FarmHouseRedone\FarmHouseRedone\bin\Debug\FarmHouseRedone.dll
+e:\users\matthew\documents\visual studio 2017\Projects\FarmHouseRedone\FarmHouseRedone\bin\Debug\FarmHouseRedone.pdb
+e:\users\matthew\documents\visual studio 2017\Projects\FarmHouseRedone\FarmHouseRedone\bin\Debug\0Harmony.dll
+e:\users\matthew\documents\visual studio 2017\Projects\FarmHouseRedone\FarmHouseRedone\obj\Debug\FarmHouseRedone.dll
+e:\users\matthew\documents\visual studio 2017\Projects\FarmHouseRedone\FarmHouseRedone\obj\Debug\FarmHouseRedone.pdb
+e:\users\matthew\documents\visual studio 2017\Projects\FarmHouseRedone\FarmHouseRedone\obj\Debug\FarmHouseRedone.csprojResolveAssemblyReference.cache
