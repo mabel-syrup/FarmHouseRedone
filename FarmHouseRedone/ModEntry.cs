@@ -232,7 +232,7 @@ namespace FarmHouseRedone
             List<Vector2> deadObjects = new List<Vector2>();
             foreach(KeyValuePair<Vector2, StardewValley.Object> objectPair in house.objects.Pairs)
             {
-                bool canBePlaced = isObjectSpotValid(objectPair.Value, house);
+                bool canBePlaced = isObjectSpotValid(objectPair.Value, objectPair.Key, house);
                 Logger.Log("Tile blocked? " + (house.isTileOnMap(objectPair.Key) && !canBePlaced).ToString());
                 if(house.isTileOnMap(objectPair.Key) && !canBePlaced)
                 {
@@ -291,7 +291,7 @@ namespace FarmHouseRedone
             foreach (StardewValley.Objects.Furniture furniture in house.furniture)
             {
                 bool canBePlaced = isFurnitureSpotValid(furniture, house);
-                Logger.Log("Tile blocked? " + (house.isTileOnMap(furniture.tileLocation) && !canBePlaced).ToString());
+                Logger.Log("Tile blocked? " + (!house.isTileOnMap(furniture.tileLocation) || !canBePlaced).ToString());
                 if(house.isTileOnMap(furniture.tileLocation) && (furniture.furniture_type == StardewValley.Objects.Furniture.window || furniture.furniture_type == StardewValley.Objects.Furniture.painting))
                 {
                     bool wasOnWall = false;
@@ -333,12 +333,12 @@ namespace FarmHouseRedone
                         }
                     }
                 }
-                else if (house.isTileOnMap(furniture.tileLocation) && !canBePlaced)
+                else if (!house.isTileOnMap(furniture.tileLocation) || !canBePlaced)
                 {
                     Logger.Log("Furniture was stuck, moving...");
                     Point newSpot = house.getRandomOpenPointInHouse(Game1.random);
                     int attempts = 0;
-                    while ((newSpot == Point.Zero || !furniture.canBePlacedHere(house, new Vector2(newSpot.X, newSpot.Y)) || (furniture.furniture_type == StardewValley.Objects.Furniture.window)) && attempts < 20)
+                    while ((newSpot == Point.Zero || !furniture.canBePlacedHere(house, new Vector2(newSpot.X, newSpot.Y)) || !isCompletelyClear(furniture, new Vector2(newSpot.X, newSpot.Y), house) || (furniture.furniture_type == StardewValley.Objects.Furniture.window)) && attempts < 20)
                     {
                         newSpot = house.getRandomOpenPointInHouse(Game1.random);
                         attempts++;
@@ -399,14 +399,97 @@ namespace FarmHouseRedone
             furniture.tileLocation.Value = Vector2.Zero;
             reclaculateFurniture(furniture);
             bool isValid = furniture.canBePlacedHere(house, realLocation);
+            bool isPartiallyStuck = !isCompletelyClear(furniture, realLocation, house);
+            bool isVoid = isTileVoid(house, realLocation);
+            Logger.Log("Spot valid? " + isValid.ToString() + " Partially Stuck? " + isPartiallyStuck.ToString() + " Void? " + isVoid.ToString());
             furniture.tileLocation.Value = realLocation;
             reclaculateFurniture(furniture);
-            return isValid;
+            return isValid && !isPartiallyStuck && !isVoid;
         }
 
-        internal bool isObjectSpotValid(StardewValley.Object candidate, FarmHouse house)
+        internal bool isCompletelyClear(StardewValley.Objects.Furniture furniture, Vector2 point, FarmHouse house)
         {
-            return house.isTilePassable(new xTile.Dimensions.Location((int)candidate.tileLocation.X, (int)candidate.tileLocation.Y), Game1.viewport);
+
+            for (int x1 = (int)point.X; x1 < point.X + furniture.getTilesWide(); ++x1)
+            {
+                for (int y1 = (int)point.Y; y1 < point.Y + furniture.getTilesHigh(); ++y1)
+                {
+                    if (house.doesTileHaveProperty(x1, y1, "NoFurniture", "Back") != null)
+                    {
+                        return false;
+                    }
+                    if (house.getTileIndexAt(x1, y1, "Buildings") != -1)
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        internal bool isObjectSpotValid(StardewValley.Object candidate, Vector2 point, FarmHouse house)
+        {
+            Logger.Log("Testing validity of " + candidate.name + "...");
+            bool passable = isPointPassableIgnoreObjects(point, house);
+            Logger.Log("Tested passability of tile " + point.ToString() + ": " + passable.ToString());
+            bool placeable = house.isTilePlaceable(point);
+            Logger.Log("Was " + (passable ? "" : "not ") + "passable, and " + (placeable ? "" : "not ") + "placeable.");
+
+            return placeable && passable;
+        }
+
+        internal bool isTileVoid(FarmHouse house, Vector2 location)
+        {
+            Logger.Log("Checking if " + location.ToString() + " is in the void...");
+            //This spot is not even on the map, so it's definitely the void
+            if (!house.isTileOnMap(location))
+            {
+                Logger.Log("Tile is off the map.");
+                return true;
+            }
+
+            Map map = house.map;
+            //There's a tile here
+            if(map.GetLayer("Back").Tiles[(int)location.X, (int)location.Y] != null)
+            {
+                Logger.Log("Tile exists...");
+                int tileIndex = map.GetLayer("Back").Tiles[(int)location.X, (int)location.Y].TileIndex;
+                //The void tile is on index 0 on both sheets, so we can exit out as soon as we see it's not 0
+                if (tileIndex != 0)
+                {
+                    Logger.Log("Tile of index " + tileIndex + " was not 0, so not void.");
+                    return false;
+                }
+                //Get the image source for the tilesheet.  This allows people to name the sheets anything they want
+                string sheetSource = map.GetLayer("Back").Tiles[(int)location.X, (int)location.Y].TileSheet.ImageSource;
+                //The void tiles are found in townInterior and farmhouse_tiles
+                Logger.Log("Tile was on townInterior? " + sheetSource.Contains("townInterior").ToString() + " Tile was on farmhouse_tiles? " + sheetSource.Contains("farmhouse_tiles").ToString());
+                return (sheetSource.Contains("townInterior") || sheetSource.Contains("farmhouse_tiles"));
+            }
+            else
+            {
+                Logger.Log("Tile was null.");
+                return true;
+            }
+        }
+
+        internal bool isPointPassableIgnoreObjects(Vector2 location, FarmHouse house)
+        {
+            if (!house.isTileOnMap(location))
+                return false;
+            Map map = house.map;
+
+            if(map.GetLayer("Back").Tiles[(int)location.X, (int)location.Y] != null)
+            {
+                //Tile flagged as impassable on the Back layer.
+                if (map.GetLayer("Back").Tiles[(int)location.X, (int)location.Y].TileIndexProperties.ContainsKey("Passable"))
+                    return false;
+            }
+            if (map.GetLayer("Buildings").Tiles[(int)location.X, (int)location.Y] != null)
+            {
+                //Tile on buildings layer is not marked as Shadow or Passable.
+                if (!map.GetLayer("Back").Tiles[(int)location.X, (int)location.Y].TileIndexProperties.ContainsKey("Shadow") && !map.GetLayer("Back").Tiles[(int)location.X, (int)location.Y].TileIndexProperties.ContainsKey("Passable"))
+                    return false;
+            }
+            return !isTileVoid(house, location);
         }
 
         internal void reclaculateFurniture(StardewValley.Objects.Furniture furniture)

@@ -3,4 +3,4 @@ e:\users\matthew\documents\visual studio 2017\Projects\FarmHouseRedone\FarmHouse
 e:\users\matthew\documents\visual studio 2017\Projects\FarmHouseRedone\FarmHouseRedone\bin\Debug\0Harmony.dll
 e:\users\matthew\documents\visual studio 2017\Projects\FarmHouseRedone\FarmHouseRedone\obj\Debug\FarmHouseRedone.dll
 e:\users\matthew\documents\visual studio 2017\Projects\FarmHouseRedone\FarmHouseRedone\obj\Debug\FarmHouseRedone.pdb
-e:\users\matthew\documents\visual studio 2017\Projects\FarmHouseRedone\FarmHouseRedone\obj\Debug\FarmHouseRedone.csprojResolveAssemblyReference.cache
+E:\Users\Matthew\Documents\Visual Studio 2017\Projects\FarmHouseRedone\FarmHouseRedone\obj\Debug\FarmHouseRedone.csprojResolveAssemblyReference.cache

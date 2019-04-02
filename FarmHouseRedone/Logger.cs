@@ -11,7 +11,7 @@ namespace FarmHouseRedone
     {
         public static IMonitor monitor;
 
-        public static void Log(string log, LogLevel level = LogLevel.Info)
+        public static void Log(string log, LogLevel level = LogLevel.Trace)
         {
             if (monitor == null)
                 return;

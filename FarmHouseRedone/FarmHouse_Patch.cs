@@ -236,6 +236,13 @@ namespace FarmHouseRedone
         }
     }
 
+    internal class CharacterArguments
+    {
+        internal int spouseGender = -1;
+        internal int farmerGender = -1;
+
+    }
+
     class FarmHouse_loadSpouseRoom_Patch
     {
         internal static bool Prefix(FarmHouse __instance)
@@ -270,7 +277,7 @@ namespace FarmHouseRedone
                 if(FarmHouseStates.spouseRooms.Keys.Contains(Game1.player.spouse))
                     return true;
                 Logger.Log("Spouse was not a base-game marriage candidate, applying vanilla-like spouse room behavior for modded spouse '" + Game1.player.spouse + "'...");
-                makeSpouseRoom(__instance, __instance.upgradeLevel == 1 ? 29 : 35, __instance.upgradeLevel == 1 ? 1 : 10, true, true, true, true, new List<string>(), new List<string>(), "");
+                makeSpouseRoom(__instance, __instance.upgradeLevel == 1 ? 29 : 35, __instance.upgradeLevel == 1 ? 1 : 10, true, true, true, true, new List<string>(), new List<string>(), "", false);
             }
 
             return false;
@@ -286,6 +293,8 @@ namespace FarmHouseRedone
             List<string> nameWhitelist = new List<string>();
             List<string> nameBlacklist = new List<string>();
             string nameOverride = "";
+            CharacterArguments args = new CharacterArguments();
+            bool destructive = false;
             int x = -1;
             int y = -1;
             while(readerIndex < spouseRoomData.Length)
@@ -295,7 +304,7 @@ namespace FarmHouseRedone
                     if (x != -1 && y != -1)
                     {
                         Logger.Log("Found spouse room definition: " + x + " " + y + (floorFlag ? " flooring " : " no flooring ") + (wallFlag ? " walls " : " no walls ") + (clutterFlag ? " clutter" : " no clutter"));
-                        makeSpouseRoom(__instance, x, y, floorFlag, wallFlag, windowFlag, clutterFlag, nameWhitelist, nameBlacklist, nameOverride);
+                        makeSpouseRoom(__instance, x, y, floorFlag, wallFlag, windowFlag, clutterFlag, nameWhitelist, nameBlacklist, nameOverride, destructive);
                         floorFlag = true;
                         wallFlag = true;
                         clutterFlag = true;
@@ -303,6 +312,8 @@ namespace FarmHouseRedone
                         nameWhitelist.Clear();
                         nameBlacklist.Clear();
                         nameOverride = "";
+                        args = new CharacterArguments();
+                        destructive = false;
                         x = -1;
                         y = -1;
                     }
@@ -346,6 +357,11 @@ namespace FarmHouseRedone
                             Logger.Log("Interpreted as 'no clutter' flag.");
                             clutterFlag = false;
                         }
+                        else if (flag.StartsWith("d"))
+                        {
+                            Logger.Log("Interpreted as 'destructive' flag.");
+                            destructive = true;
+                        }
                     }
                     else if (spouseRoomData[readerIndex].StartsWith("+"))
                     {
@@ -365,6 +381,53 @@ namespace FarmHouseRedone
                         Logger.Log("Spouse room set to behave as " + name + "'s spouse room (" + name + "_spouseroom.tbin)");
                         nameOverride = name;
                     }
+                    else if (spouseRoomData[readerIndex].StartsWith("%"))
+                    {
+                        string argumentString = spouseRoomData[readerIndex].TrimStart('%').ToLower();
+                        Logger.Log("Character argument detected: " + argumentString);
+                        string[] argument = argumentString.Split(':');
+                        if (argument[0].StartsWith("gen"))
+                        {
+                            bool ofSpouse = false;
+                            int gender = -1;
+                            Logger.Log("Interpreting as gender-based argument...");
+                            if(argument[1].StartsWith("p") || argument[1].StartsWith("f"))
+                            {
+                                Logger.Log("Gender of Player argument...");
+                            }
+                            else if(argument[1].StartsWith("s") || argument[1].StartsWith("n") || argument[1].StartsWith("h") || argument[1].StartsWith("w"))
+                            {
+                                Logger.Log("Gender of Spouse argument...");
+                            }
+                            if (argument[2].StartsWith("m") || argument[2].StartsWith("b"))
+                            {
+                                Logger.Log("Gender set to Male...");
+                                gender = 0;
+                            }
+                            else if (argument[2].StartsWith("w") || argument[2].StartsWith("g") || argument[2].StartsWith("f"))
+                            {
+                                Logger.Log("Gender set to Female...");
+                                gender = 1;
+                            }
+                            else
+                            {
+                                Logger.Log("Gender set to Nonbinary...");
+                                gender = 2;
+                            }
+                            if (ofSpouse)
+                            {
+                                args.spouseGender = gender;
+                            }
+                            else
+                            {
+                                args.farmerGender = gender;
+                            }
+                        }
+                        if (argument[0].StartsWith("anx"))
+                        {
+                            Logger.Log("Interpreting as anxiety-based argument...");
+                        }
+                    }
                     else
                     {
                         Logger.Log("Unsure what to do with '" + spouseRoomData[readerIndex] + "'...");
@@ -375,11 +438,11 @@ namespace FarmHouseRedone
             if (x != -1 && y != -1)
             {
                 Logger.Log("Found spouse room definition: " + x + " " + y + (floorFlag ? " flooring " : " no flooring ") + (wallFlag ? " walls " : " no walls ") + (clutterFlag ? " clutter" : " no clutter"));
-                makeSpouseRoom(__instance, x, y, floorFlag, wallFlag, windowFlag, clutterFlag, nameWhitelist, nameBlacklist, nameOverride);
+                makeSpouseRoom(__instance, x, y, floorFlag, wallFlag, windowFlag, clutterFlag, nameWhitelist, nameBlacklist, nameOverride, destructive);
             }
         }
 
-        internal static void makeSpouseRoom(FarmHouse __instance, int x, int y, bool floor, bool wall, bool window, bool clutter, List<string> whiteList, List<string> blackList, string nameOverride)
+        internal static void makeSpouseRoom(FarmHouse __instance, int x, int y, bool floor, bool wall, bool window, bool clutter, List<string> whiteList, List<string> blackList, string nameOverride, bool destructive)
         {
             bool hadAcceptableSpouse = false;
             bool hadOnlyBlacklistSpouse = true;
@@ -424,7 +487,7 @@ namespace FarmHouseRedone
             }
             FarmHouseStates.clear();
 
-            pasteSpouseRoom(__instance, spouseName, new Rectangle(x, y, 6, 9), floor, wall, window, clutter);
+            pasteSpouseRoom(__instance, spouseName, new Rectangle(x, y, 6, 9), floor, wall, window, clutter, destructive);
         }
 
         internal static bool isNumeric(string candidate)
@@ -433,7 +496,7 @@ namespace FarmHouseRedone
             return int.TryParse(candidate, out n);
         }
 
-        internal static void pasteSpouseRoom(FarmHouse __instance, string spouse, Rectangle spouseRoomRect, bool floor, bool wall, bool window, bool clutter)
+        internal static void pasteSpouseRoom(FarmHouse __instance, string spouse, Rectangle spouseRoomRect, bool floor, bool wall, bool window, bool clutter, bool destructive)
         {
             int num = FarmHouseStates.getSpouseRoom(spouse);
             Map map = FarmHouseStates.loadSpouseRoomIfPresent(spouse);
@@ -473,9 +536,13 @@ namespace FarmHouseRedone
             {
                 for (int index2 = 0; index2 < spouseRoomRect.Height; ++index2)
                 {
-                    pasteBackLayer(__instance.map, map, spouseRoomRect, point, index1, index2, floor, wall, clutter);
-                    pasteBuildingsLayer(__instance.map, map, spouseRoomRect, point, index1, index2, adjustMapLightPropertiesForLamp, floor, wall, window, clutter);
-                    pasteFrontLayer(__instance.map, map, spouseRoomRect, point, index1, index2, adjustMapLightPropertiesForLamp, floor, wall, window, clutter);
+
+                    pasteBackLayer(__instance.map, map, spouseRoomRect, point, index1, index2, floor, wall, clutter, destructive);
+                    addProperties(map, __instance.Map, new Point(spouseRoomRect.X, spouseRoomRect.Y), "Back", index1, index2);
+                    pasteBuildingsLayer(__instance.map, map, spouseRoomRect, point, index1, index2, adjustMapLightPropertiesForLamp, floor, wall, window, clutter, destructive);
+                    addProperties(map, __instance.Map, new Point(spouseRoomRect.X, spouseRoomRect.Y), "Buildings", index1, index2);
+                    pasteFrontLayer(__instance.map, map, spouseRoomRect, point, index1, index2, adjustMapLightPropertiesForLamp, floor, wall, window, clutter, destructive);
+                    addProperties(map, __instance.Map, new Point(spouseRoomRect.X, spouseRoomRect.Y), "Front", index1, index2);
                     //if (map.GetLayer("Back").Tiles[point.X + index1, point.Y + index2] != null)
                     //    __instance.map.GetLayer("Back").Tiles[spouseRoomRect.X + index1, spouseRoomRect.Y + index2] = (Tile)new StaticTile(__instance.map.GetLayer("Back"), __instance.map.TileSheets[getEquivalentSheet(map.GetLayer("Back").Tiles[point.X + index1, point.Y + index2])], BlendMode.Alpha, map.GetLayer("Back").Tiles[point.X + index1, point.Y + index2].TileIndex);
                     //if (map.GetLayer("Buildings").Tiles[point.X + index1, point.Y + index2] != null)
@@ -496,9 +563,96 @@ namespace FarmHouseRedone
                         __instance.map.GetLayer("Back").Tiles[spouseRoomRect.X + index1, spouseRoomRect.Y + index2].Properties.Add(new KeyValuePair<string, PropertyValue>("NoFurniture", new PropertyValue("T")));
                 }
             }
+
+            Point spousePoint = new Point(spouseRoomRect.X, spouseRoomRect.Y);
+
+            //Combine properties
+            foreach (KeyValuePair<string, PropertyValue> pair in map.Properties)
+            {
+                PropertyValue value = pair.Value;
+                string propertyName = pair.Key;
+                Logger.Log("Spouse room map contained Properties data, applying now...");
+                if (propertyName.Equals("Warp"))
+                {
+                    //propertyName = "Warp";
+                    Logger.Log("Adjusting warp property...");
+                    string[] warpParts = FarmHouseStates.cleanup(value.ToString()).Split(' ');
+                    string warpShifted = "";
+                    for (int index = 0; index < warpParts.Length; index += 5)
+                    {
+                        try
+                        {
+                            Logger.Log("Relative warp found: " + warpParts[index + 0] + " " + warpParts[index + 1] + " " + warpParts[index + 2] + " " + warpParts[index + 3] + " " + warpParts[index + 4]);
+                            int xi = -1;
+                            int yi = -1;
+                            int xii = -1;
+                            int yii = -1;
+                            if (warpParts[0].StartsWith("~"))
+                                xi = spousePoint.X + Convert.ToInt32(warpParts[index + 0].TrimStart('~'));
+                            else
+                                xi = Convert.ToInt32(warpParts[0]);
+                            if (warpParts[1].StartsWith("~"))
+                                yi = spousePoint.Y + Convert.ToInt32(warpParts[index + 1].TrimStart('~'));
+                            else
+                                yi = Convert.ToInt32(warpParts[1]);
+                            if (warpParts[3].StartsWith("~"))
+                                xii = spousePoint.X + Convert.ToInt32(warpParts[index + 3].TrimStart('~'));
+                            else
+                                xii = Convert.ToInt32(warpParts[3]);
+                            if (warpParts[4].StartsWith("~"))
+                                yii = spousePoint.Y + Convert.ToInt32(warpParts[index + 4].TrimStart('~'));
+                            else
+                                yii = Convert.ToInt32(warpParts[4]);
+                            string returnWarp = xi + " " + yi + " " + warpParts[index + 2] + " " + xii + " " + yii + " ";
+                            Logger.Log("Relative warp became " + returnWarp);
+                            warpShifted += returnWarp;
+                        }
+                        catch (IndexOutOfRangeException)
+                        {
+                            Logger.Log("Incomplete warp definition found!  Please ensure all warp definitions are formatted as 'X Y map X Y'", LogLevel.Warn);
+                        }
+                        catch (FormatException)
+                        {
+                            Logger.Log("Invalid warp definition found!  Please ensure all warp definitions use numbers fro the X and Y coordinates!", LogLevel.Warn);
+                        }
+                    }
+                    value = warpShifted.Trim(' ');
+                    Logger.Log("Warp property is now " + value.ToString());
+                }
+                if (!__instance.map.Properties.ContainsKey(propertyName))
+                {
+                    Logger.Log("FarmHouse map did not have a '" + propertyName + "' property, setting it to '" + propertyName + "'...");
+                    __instance.map.Properties.Add(propertyName, value);
+                }
+                else
+                {
+                    PropertyValue houseValue = __instance.map.Properties[propertyName];
+                    Logger.Log("Farmhouse map already had a '" + propertyName + "' value, appending...");
+                    __instance.map.Properties[propertyName] = (houseValue.ToString() + " " + value.ToString()).Trim(' ');
+                    Logger.Log(propertyName + " is now " + __instance.map.Properties[propertyName].ToString());
+                }
+            }
         }
 
-        internal static void pasteFrontLayer(Map houseMap, Map spouseMap, Rectangle spouseRoomRect, Point spousePoint, int x, int y, IReflectedMethod adjustMapLightPropertiesForLamp, bool floor, bool wall, bool window, bool clutter)
+        internal static void addProperties(Map sectionMap, Map houseMap, Point housePoint, string layer, int x, int y)
+        {
+            if (sectionMap.GetLayer(layer).Tiles[x, y] != null)
+            {
+                Logger.Log("Checking for properties...");
+                if (sectionMap.GetLayer(layer).Tiles[x, y].Properties.Keys.Count > 0)
+                {
+                    Logger.Log("Properties discovered.");
+                    foreach (KeyValuePair<string, PropertyValue> pair in sectionMap.GetLayer(layer).Tiles[x, y].Properties)
+                    {
+                        Logger.Log("Applying property '" + pair.Key + "' to tile " + new Vector2(housePoint.X + x, housePoint.Y + y).ToString() + "...");
+                        houseMap.GetLayer(layer).Tiles[housePoint.X + x, housePoint.Y + y].Properties[pair.Key] = pair.Value;
+                        Logger.Log("Applied.");
+                    }
+                }
+            }
+        }
+
+        internal static void pasteFrontLayer(Map houseMap, Map spouseMap, Rectangle spouseRoomRect, Point spousePoint, int x, int y, IReflectedMethod adjustMapLightPropertiesForLamp, bool floor, bool wall, bool window, bool clutter, bool destructive)
         {
             
 
@@ -533,11 +687,11 @@ namespace FarmHouseRedone
                 houseMap.GetLayer("Front").Tiles[spouseRoomRect.X + x, spouseRoomRect.Y + y] = (Tile)new StaticTile(houseMap.GetLayer("Front"), houseMap.TileSheets[getEquivalentSheet(spouseMap.GetLayer("Front").Tiles[spousePoint.X + x, spousePoint.Y + y])], BlendMode.Alpha, spouseMap.GetLayer("Front").Tiles[spousePoint.X + x, spousePoint.Y + y].TileIndex);
                 adjustMapLightPropertiesForLamp.Invoke(spouseMap.GetLayer("Front").Tiles[spousePoint.X + x, spousePoint.Y + y].TileIndex, spouseRoomRect.X + x, spouseRoomRect.Y + y, "Front");
             }
-            else if (y < spouseRoomRect.Height - 1)
+            else if (y < spouseRoomRect.Height - 1 || destructive)
                 houseMap.GetLayer("Front").Tiles[spouseRoomRect.X + x, spouseRoomRect.Y + y] = (Tile)null;
         }
 
-        internal static void pasteBuildingsLayer(Map houseMap, Map spouseMap, Rectangle spouseRoomRect, Point spousePoint, int x, int y, IReflectedMethod adjustMapLightPropertiesForLamp, bool floor, bool wall, bool window, bool clutter)
+        internal static void pasteBuildingsLayer(Map houseMap, Map spouseMap, Rectangle spouseRoomRect, Point spousePoint, int x, int y, IReflectedMethod adjustMapLightPropertiesForLamp, bool floor, bool wall, bool window, bool clutter, bool destructive)
         {
             if (spouseMap.GetLayer("Buildings").Tiles[spousePoint.X + x, spousePoint.Y + y] != null)
             {
@@ -578,9 +732,13 @@ namespace FarmHouseRedone
 
                 adjustMapLightPropertiesForLamp.Invoke(spouseMap.GetLayer("Buildings").Tiles[spousePoint.X + x, spousePoint.Y + y].TileIndex, spouseRoomRect.X + x, spouseRoomRect.Y + y, "Buildings");
             }
+            else if (destructive)
+            {
+                houseMap.GetLayer("Buildings").Tiles[spouseRoomRect.X + x, spouseRoomRect.Y + y] = null;
+            }
         }
 
-        internal static void pasteBackLayer(Map houseMap, Map spouseMap, Rectangle spouseRoomRect, Point spousePoint, int x, int y, bool floor, bool wall, bool clutter)
+        internal static void pasteBackLayer(Map houseMap, Map spouseMap, Rectangle spouseRoomRect, Point spousePoint, int x, int y, bool floor, bool wall, bool clutter, bool destructive)
         {
             //If the house has a tile on the back layer at the corresponding coordinate
             if (spouseMap.GetLayer("Back").Tiles[spousePoint.X + x, spousePoint.Y + y] != null)
@@ -612,6 +770,10 @@ namespace FarmHouseRedone
                         BlendMode.Alpha,
                         spouseMap.GetLayer("Back").Tiles[spousePoint.X + x, spousePoint.Y + y].TileIndex
                 );
+            }
+            else if (destructive)
+            {
+                houseMap.GetLayer("Back").Tiles[spouseRoomRect.X + x, spouseRoomRect.Y + y] = null;
             }
         }
 
@@ -952,22 +1114,31 @@ namespace FarmHouseRedone
         internal static void pasteTile(Map houseMap, Map sectionMap, Point housePoint, int x, int y, string layer, bool destructive = false)
         {
             //If the pasted map has a tile on the Back layer at that location
+            Logger.Log("Trying to paste index (" + x + ", " + y + ") local; (" + (x + housePoint.X) + ", " + (y + housePoint.Y) + ") global...");
             if (sectionMap.GetLayer(layer).Tiles[x, y] != null)
             {
+                Logger.Log("Local tile was not null...");
                 Tile sectionTile = sectionMap.GetLayer(layer).Tiles[x, y];
                 TileSheet sheet = getEquivalentSheet(houseMap, sectionTile.TileSheet);
+                Logger.Log("Setting global tile to local tile...");
                 houseMap.GetLayer(layer).Tiles[housePoint.X + x, housePoint.Y + y] = new StaticTile(houseMap.GetLayer(layer), sheet, BlendMode.Alpha, sectionTile.TileIndex);
-                if(sectionTile.Properties.Keys.Count > 0)
+                Logger.Log("Checking for properties...");
+                if (sectionTile.Properties.Keys.Count > 0)
                 {
+                    Logger.Log("Properties discovered.");
                     foreach(KeyValuePair<string, PropertyValue> pair in sectionTile.Properties)
                     {
+                        Logger.Log("Applying property '" + pair.Key + "'...");
                         houseMap.GetLayer(layer).Tiles[housePoint.X + x, housePoint.Y + y].Properties[pair.Key] = pair.Value;
+                        Logger.Log("Applied.");
                     }
                 }
             }
             else if((!layer.Equals("Back") || destructive) && houseMap.GetLayer(layer).Tiles[housePoint.X + x, housePoint.Y + y] != null)
             {
+                Logger.Log("Global tile was not null, and local tile was.  Deleting...");
                 houseMap.GetLayer(layer).Tiles[housePoint.X + x, housePoint.Y + y] = null;
+                Logger.Log("Deleted.");
             }
         }
 
