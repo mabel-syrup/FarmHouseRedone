@@ -1,11 +1,25 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
+# user-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 
-*.zip
-/FarmHouseRedone/bin/Debug/Newtonsoft.Json.dll
-/FarmHouseRedone/bin/Debug/Newtonsoft.Json.xml
-/.vs/FarmHouseRedone/v15/Server/sqlite3/db.lock
-/.vs/FarmHouseRedone/v15/Server/sqlite3/storage.ide
-/.vs/FarmHouseRedone/v15/Server/sqlite3/storage.ide-shm
-/.vs/FarmHouseRedone/v15/Server/sqlite3/storage.ide-wal
+# build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio cache/options
+.vs/
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# NuGet packages
+*.nupkg
+**/packages/*
+*.nuget.props
+*.nuget.targets
