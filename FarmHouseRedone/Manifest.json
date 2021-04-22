@@ -1,7 +1,7 @@
 ﻿{
   "Name": "FarmHouseRedone",
   "Author": "MabelSyrup",
-  "Version": "0.3.8",
+  "Version": "0.3.9-unofficial.1-strobe",
   "Description": "Allows for farmhouse maps to change the shape and layout of the house",
   "UniqueID": "mabelsyrup.farmhouse",
   "EntryDll": "FarmHouseRedone.dll",

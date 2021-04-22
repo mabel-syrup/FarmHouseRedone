@@ -578,7 +578,16 @@ namespace FarmHouseRedone
 
         public static List<int> townInteriorFloorFurniture = new List<int>
         {
-            216, 217, 313, 314, 331, 334, 335, 336, 337, 345, 346, 347, 348, 349, 350, 368, 369, 377, 178, 379, 380, 381, 382, 383, 400, 401, 408, 409, 412, 413, 415, 431, 433, 434, 440, 441, 444, 472, 473, 474, 476, 482, 483, 486, 487, 491, 502, 503, 504, 505, 506, 518, 519, 523, 534, 535, 536, 537, 538, 544, 545, 546, 551, 552, 556, 557, 558, 577, 578, 583, 584, 588, 589, 590, 608, 609, 610, 611, 612, 613, 614, 623, 624, 625, 641, 642, 643, 644, 645, 646, 651, 655, 656, 657, 658, 659, 660, 663, 672, 673, 675, 679, 680, 687, 688, 689, 690, 694, 695, 691, 692, 704, 711, 712, 722, 723, 724, 726, 727, 736, 743, 768, 800, 813, 814, 815, 832, 833, 834, 860, 864, 875, 876, 886, 892, 897, 865, 1029, 1062, 1063, 1064, 1094, 1095, 1096, 1108, 1109, 1111, 1143, 1179, 1141, 1180, 1191, 1127, 1128, 1136, 1168, 1179, 1200, 1322, 1327, 1328, 1335, 1348, 1354, 1359, 1360, 1367, 1387, 1388, 1459, 1491, 1525, 1589, 1621, 1837, 1912, 1940, 1944, 1974, 1982, 1983, 1950, 1951, 2115, 2136, 2137, 2141, 2147, 2167, 2168, 2169, 2173
+            216, 217, 313, 314, 331, 334, 335, 336, 337, 345, 346, 347, 348, 349, 350, 368, 369, 377, 178, 379, 380,
+            381, 382, 383, 400, 401, 408, 409, 412, 413, 415, 431, 433, 434, 440, 441, 444, 472, 473, 474, 476, 482,
+            483, 486, 487, 491, 502, 503, 504, 505, 506, 518, 519, 523, 534, 535, 536, 537, 538, 544, 545, 546, 551,
+            552, 556, 557, 558, 577, 578, 583, 584, 588, 589, 590, 608, 609, 610, 611, 612, 613, 614, 623, 624, 625,
+            641, 642, 643, 644, 645, 646, 651, 655, 656, 657, 658, 659, 660, 663, 672, 673, 675, 679, 680, 687, 688,
+            689, 690, 694, 695, 691, 692, 704, 711, 712, 722, 723, 724, 726, 727, 736, 743, 768, 800, 813, 814, 815,
+            832, 833, 834, 860, 864, 875, 876, 886, 892, 897, 865, 1029, 1062, 1063, 1064, 1094, 1095, 1096, 1108, 1109,
+            1111, 1143, 1179, 1141, 1180, 1191, 1127, 1128, 1136, 1168, 1179, 1200, 1322, 1327, 1328, 1335, 1348, 1354,
+            1359, 1360, 1367, 1387, 1388, 1459, 1491, 1525, 1589, 1621, 1837, 1912, 1940, 1944, 1974, 1982, 1983, 1950,
+            1951, 2115, 2136, 2137, 2141, 2147, 2167, 2168, 2169, 2173
         };
 
         public static List<int> townInteriorWindows = new List<int>
@@ -605,55 +614,49 @@ namespace FarmHouseRedone
         public static void init()
         {
             states = new Dictionary<FarmHouse, FarmHouseState>();
-            foreach(GameLocation location in Game1.locations)
-            {
-                if(location is FarmHouse)
-                {
+            foreach (var location in Game1.locations)
+                if (location is FarmHouse)
                     states[location as FarmHouse] = new FarmHouseState();
-                }
-            }
             loadVanillaSpouses();
             //upgrades = new List<LevelNUpgrade>();
             //loadAllUpgrades();
-
         }
 
         internal static void loadAllUpgrades()
         {
-            string[] upgradeFiles = getFiles(".json", System.IO.Path.Combine("assets", "upgrades"));
-            foreach (string upgradeFile in upgradeFiles)
-            {
+            var upgradeFiles = getFiles(".json", Path.Combine("assets", "upgrades"));
+            foreach (var upgradeFile in upgradeFiles)
                 try
                 {
-                    Dictionary<string, object> file = loader.Load<Dictionary<string, object>>("assets/upgrades/" + upgradeFile, StardewModdingAPI.ContentSource.ModFolder);
-                    string version = file["Version"].ToString();
+                    var file = loader.Load<Dictionary<string, object>>("assets/upgrades/" + upgradeFile,
+                        ContentSource.ModFolder);
+                    var version = file["Version"].ToString();
                     Logger.Log("Loading " + upgradeFile + " as version " + version);
 
-                    JArray upgradeList = file["Upgrades"] as JArray;
+                    var upgradeList = file["Upgrades"] as JArray;
                     Logger.Log("Found " + upgradeList.Count + " upgrades.");
-                    foreach(JObject upgradeObj in file["Upgrades"] as JArray)
+                    foreach (JObject upgradeObj in file["Upgrades"] as JArray)
                     {
-                        LevelNUpgrade upgrade = new LevelNUpgrade(upgradeObj);
+                        var upgrade = new LevelNUpgrade(upgradeObj);
                         Logger.Log(upgrade.ToString(), LogLevel.Info);
                         upgrades.Add(upgrade);
                     }
                 }
                 catch (Microsoft.Xna.Framework.Content.ContentLoadException e)
                 {
-                    Logger.Log("There was a problem loading the file " + upgradeFile + "!", StardewModdingAPI.LogLevel.Error);
+                    Logger.Log("There was a problem loading the file " + upgradeFile + "!", LogLevel.Error);
                     throw e;
                 }
                 catch (KeyNotFoundException e)
                 {
-                    Logger.Log("There was a problem loading the file " + upgradeFile + "!", StardewModdingAPI.LogLevel.Error);
+                    Logger.Log("There was a problem loading the file " + upgradeFile + "!", LogLevel.Error);
                     throw e;
                 }
                 catch (FormatException e)
                 {
-                    Logger.Log("There was a problem loading the file " + upgradeFile + "!", StardewModdingAPI.LogLevel.Error);
+                    Logger.Log("There was a problem loading the file " + upgradeFile + "!", LogLevel.Error);
                     throw e;
                 }
-            }
         }
 
         //public static bool hasUpgradeAvailable()
@@ -671,14 +674,13 @@ namespace FarmHouseRedone
 
         public static string[] getFiles(string extension, string path = "")
         {
-            string[] files = Directory.GetFiles(path == "" ? modPath : Path.Combine(modPath, path));
-            List<string> outFiles = new List<string>();
+            var files = Directory.GetFiles(path == "" ? modPath : Path.Combine(modPath, path));
+            var outFiles = new List<string>();
             Logger.Log("Found " + files.Length + " files inside FarmHouseRedone/" + path + " ...");
-            foreach (string file in files)
-            {
+            foreach (var file in files)
                 if (file.EndsWith(extension))
                 {
-                    string matchedFile = Path.GetFileName(file);
+                    var matchedFile = Path.GetFileName(file);
                     outFiles.Add(matchedFile);
                     Logger.Log("Found file '" + matchedFile + "'");
                 }
@@ -687,31 +689,24 @@ namespace FarmHouseRedone
                     //string wrongFileName = Path.GetFileName(file);
                     //Logger.Log(wrongFileName + " was not a " + extension + " file...");
                 }
-            }
 
             return outFiles.ToArray();
         }
 
         internal static void clearAll()
         {
-            foreach(FarmHouse house in states.Keys)
-            {
-                states[house].clear();
-            }
+            foreach (var house in states.Keys) states[house].clear();
         }
 
         public static void clear(FarmHouse house)
         {
-            if (!states.ContainsKey(house))
-            {
-                states[house] = new FarmHouseState();
-            }
+            if (!states.ContainsKey(house)) states[house] = new FarmHouseState();
             states[house].clear();
         }
 
         public static int getSpouseRoom(string name)
         {
-            int result = -1;
+            var result = -1;
             spouseRooms.TryGetValue(name, out result);
             return result;
         }
@@ -733,81 +728,75 @@ namespace FarmHouseRedone
             spouseRooms["Krobus"] = 12;
         }
 
-        
 
         public static FarmHouseState getState(FarmHouse house)
         {
             if (!states.ContainsKey(house))
             {
-                Logger.Log("No state found for " + house.name + "!  (" + house.uniqueName + ")");
+                Logger.Log("No state found for " + house.Name + "!  (" + house.NameOrUniqueName + ")");
                 states[house] = new FarmHouseState();
             }
+
             return states[house];
         }
 
         public static Map makeMapCopy(FarmHouse house, string mapPath)
         {
-            Map sourceMap = loader.Load<Map>(mapPath, ContentSource.GameContent);
-            Map newMap = new Map();
-            foreach (xTile.Tiles.TileSheet sheet in sourceMap.TileSheets)
+            var sourceMap = loader.Load<Map>(mapPath, ContentSource.GameContent);
+            var newMap = new Map();
+            foreach (var sheet in sourceMap.TileSheets)
             {
-                xTile.Tiles.TileSheet newSheet = new xTile.Tiles.TileSheet(newMap, sheet.ImageSource, sheet.SheetSize, sheet.TileSize);
+                var newSheet = new xTile.Tiles.TileSheet(newMap, sheet.ImageSource, sheet.SheetSize, sheet.TileSize);
                 newSheet.Id = sheet.Id;
                 newMap.AddTileSheet(newSheet);
                 Logger.Log("Adding tilesheet " + newSheet.Id + " (" + newSheet.ImageSource + ")");
             }
-            foreach (xTile.Layers.Layer layer in sourceMap.Layers)
+
+            foreach (var layer in sourceMap.Layers)
             {
-                xTile.Layers.Layer newLayer = new xTile.Layers.Layer(layer.Id, newMap, layer.LayerSize, layer.TileSize);
-                xTile.Tiles.TileArray tiles = layer.Tiles;
-                for (int x = 0; x < layer.LayerWidth; x++)
-                {
-                    for (int y = 0; y < layer.LayerHeight; y++)
+                var newLayer = new xTile.Layers.Layer(layer.Id, newMap, layer.LayerSize, layer.TileSize);
+                var tiles = layer.Tiles;
+                for (var x = 0; x < layer.LayerWidth; x++)
+                for (var y = 0; y < layer.LayerHeight; y++)
+                    if (tiles[x, y] != null)
                     {
-                        if (tiles[x, y] != null)
+                        var tile = tiles[x, y];
+                        if (tile is xTile.Tiles.StaticTile)
                         {
-                            xTile.Tiles.Tile tile = tiles[x, y];
-                            if (tile is xTile.Tiles.StaticTile)
-                            {
-                                Logger.Log("Searching for sheet '" + tile.TileSheet.Id + "'...");
-                                newLayer.Tiles[x, y] = new xTile.Tiles.StaticTile(newLayer, newMap.GetTileSheet(tile.TileSheet.Id), tile.BlendMode, tile.TileIndex);
-                            }
-                            else
-                            {
-                                xTile.Tiles.AnimatedTile animTile = (tile as xTile.Tiles.AnimatedTile);
-                                xTile.Tiles.StaticTile[] frames = new xTile.Tiles.StaticTile[animTile.TileFrames.Length];
-                                for(int frame = 0; frame < animTile.TileFrames.Length; frame++)
-                                {
-                                    frames[frame] = new xTile.Tiles.StaticTile(newLayer, newMap.GetTileSheet(animTile.TileSheet.Id), animTile.BlendMode, animTile.TileFrames[frame].TileIndex);
-                                }
-                                newLayer.Tiles[x, y] = new xTile.Tiles.AnimatedTile(newLayer, frames, animTile.FrameInterval);
-                            }
-                            foreach(string key in tile.Properties.Keys)
-                            {
-                                newLayer.Tiles[x, y].Properties[key] = tile.Properties[key];
-                            }
+                            Logger.Log("Searching for sheet '" + tile.TileSheet.Id + "'...");
+                            newLayer.Tiles[x, y] = new xTile.Tiles.StaticTile(newLayer,
+                                newMap.GetTileSheet(tile.TileSheet.Id), tile.BlendMode, tile.TileIndex);
                         }
+                        else
+                        {
+                            var animTile = tile as xTile.Tiles.AnimatedTile;
+                            var frames = new xTile.Tiles.StaticTile[animTile.TileFrames.Length];
+                            for (var frame = 0; frame < animTile.TileFrames.Length; frame++)
+                                frames[frame] = new xTile.Tiles.StaticTile(newLayer,
+                                    newMap.GetTileSheet(animTile.TileSheet.Id), animTile.BlendMode,
+                                    animTile.TileFrames[frame].TileIndex);
+                            newLayer.Tiles[x, y] =
+                                new xTile.Tiles.AnimatedTile(newLayer, frames, animTile.FrameInterval);
+                        }
+
+                        foreach (var key in tile.Properties.Keys)
+                            newLayer.Tiles[x, y].Properties[key] = tile.Properties[key];
                     }
-                }
-                foreach(string key in layer.Properties.Keys)
-                {
-                    newLayer.Properties[key] = layer.Properties[key];
-                }
+
+                foreach (var key in layer.Properties.Keys) newLayer.Properties[key] = layer.Properties[key];
                 newMap.Layers.Add(newLayer);
             }
-            foreach(string key in sourceMap.Properties.Keys)
-            {
-                newMap.Properties[key] = sourceMap.Properties[key];
-            }
+
+            foreach (var key in sourceMap.Properties.Keys) newMap.Properties[key] = sourceMap.Properties[key];
             return newMap;
         }
 
         public static void updateFromMapPath(FarmHouse house, string mapPath)
         {
             clear(house);
-            FarmHouseState state = getState(house);
+            var state = getState(house);
             //Map map = makeMapCopy(house, mapPath);
-            Map map = loader.Load<Map>(mapPath, ContentSource.GameContent);
+            var map = loader.Load<Map>(mapPath, ContentSource.GameContent);
             PropertyValue bed;
             map.Properties.TryGetValue("Bed", out bed);
             if (bed != null)
@@ -833,7 +822,7 @@ namespace FarmHouseRedone
                 state.entryData = Utility.cleanup(entry.ToString());
             else
                 state.entryData = "";
-            
+
             PropertyValue cellar;
             map.Properties.TryGetValue("Cellar", out cellar);
             if (cellar != null)
@@ -848,14 +837,11 @@ namespace FarmHouseRedone
             else
                 state.levelThreeData = "";
 
-            if (mapPath.Contains("_marriage"))
-            {
-                state.isMarriage = true;
-            }
+            if (mapPath.Contains("_marriage")) state.isMarriage = true;
 
             Logger.Log("Getting tilesheets for map " + map.Id + " (" + mapPath + ")...");
 
-            foreach (xTile.Tiles.TileSheet sheet in map.TileSheets)
+            foreach (var sheet in map.TileSheets)
             {
                 Logger.Log("Sheet source is " + sheet.ImageSource);
                 if (sheet.ImageSource.Contains("walls_and_floors"))
@@ -881,13 +867,13 @@ namespace FarmHouseRedone
 
         public static Point getEntryLocation(FarmHouse house)
         {
-            FarmHouseState state = getState(house);
+            var state = getState(house);
             if (state.entryData == null)
-                updateFromMapPath(house, house.mapPath);
+                updateFromMapPath(house, house.mapPath.Value);
             if (state.entryData != "")
             {
                 Logger.Log("Map defined entry location...");
-                string[] entryPoint = state.entryData.Split(' ');
+                var entryPoint = state.entryData.Split(' ');
                 return new Point(Convert.ToInt32(entryPoint[0]), Convert.ToInt32(entryPoint[1]));
             }
             else
@@ -899,13 +885,13 @@ namespace FarmHouseRedone
 
         public static Point getCellarLocation(FarmHouse house)
         {
-            FarmHouseState state = getState(house);
+            var state = getState(house);
             if (state.cellarData == null)
-                updateFromMapPath(house, house.mapPath);
+                updateFromMapPath(house, house.mapPath.Value);
             if (state.cellarData != "")
             {
                 Logger.Log("Map defined entry location...");
-                string[] cellarPoint = state.cellarData.Split(' ');
+                var cellarPoint = state.cellarData.Split(' ');
                 return new Point(Convert.ToInt32(cellarPoint[0]), Convert.ToInt32(cellarPoint[1]));
             }
             else
@@ -917,13 +903,13 @@ namespace FarmHouseRedone
 
         public static Point getKitchenSpot(FarmHouse house)
         {
-            FarmHouseState state = getState(house);
+            var state = getState(house);
             if (state.kitchenData == null)
-                updateFromMapPath(house, house.mapPath);
+                updateFromMapPath(house, house.mapPath.Value);
             if (state.kitchenData != "")
             {
                 Logger.Log("Map defined kitchen location...");
-                string[] kitchenPoint = state.kitchenData.Split(' ');
+                var kitchenPoint = state.kitchenData.Split(' ');
                 return new Point(Convert.ToInt32(kitchenPoint[0]), Convert.ToInt32(kitchenPoint[1]));
             }
             else
@@ -935,21 +921,22 @@ namespace FarmHouseRedone
 
         public static Point getMainBedSpot()
         {
-            FarmHouse house = Game1.getLocationFromName("FarmHouse") as FarmHouse;
+            var house = Game1.getLocationFromName("FarmHouse") as FarmHouse;
             return getBedSpot(house);
         }
 
         public static Point getBedSpot(FarmHouse house, bool spouse = false)
         {
-            FarmHouseState state = getState(house);
+            var state = getState(house);
             Logger.Log("Getting bed location...");
             if (state.bedData == null)
-                updateFromMapPath(house, house.mapPath);
+                updateFromMapPath(house, house.mapPath.Value);
             if (state.bedData != "")
             {
                 Logger.Log("Map defined bed location...");
-                string[] bedPoint = state.bedData.Split(' ');
-                Point bedLocation = new Point(Convert.ToInt32(bedPoint[0]) + (spouse ? 2 : 0), Convert.ToInt32(bedPoint[1]));
+                var bedPoint = state.bedData.Split(' ');
+                var bedLocation = new Point(Convert.ToInt32(bedPoint[0]) + (spouse ? 2 : 0),
+                    Convert.ToInt32(bedPoint[1]));
 
                 Logger.Log("Defined bed location as " + bedLocation.ToString());
 
@@ -977,34 +964,34 @@ namespace FarmHouseRedone
 
         public static void drawAStarPath(FarmHouse house, ref Color[] data)
         {
-            int width = house.map.GetLayer("Back").LayerWidth;
-            int height = house.map.GetLayer("Back").LayerHeight;
+            var width = house.map.GetLayer("Back").LayerWidth;
+            var height = house.map.GetLayer("Back").LayerHeight;
 
-            Pathing.Path pather = new Pathing.Path(house, width, height);
-            List<Pathing.Node> path = pather.FindPath(StardewValley.Utility.PointToVector2(getEntryLocation(house)), StardewValley.Utility.PointToVector2(getBedSpot(house)));
+            var pather = new Pathing.Path(house, width, height);
+            var path = pather.FindPath(StardewValley.Utility.PointToVector2(getEntryLocation(house)),
+                StardewValley.Utility.PointToVector2(getBedSpot(house)));
 
-            foreach(Pathing.Node node in path)
-            {
-                data[node.x + node.y * width] = Color.SeaGreen;
-            }
+            foreach (var node in path) data[node.x + node.y * width] = Color.SeaGreen;
         }
 
         public static void updateMapData(FarmHouse house)
         {
-            int width = house.map.GetLayer("Back").LayerWidth;
-            int height = house.map.GetLayer("Back").LayerHeight;
+            var width = house.map.GetLayer("Back").LayerWidth;
+            var height = house.map.GetLayer("Back").LayerHeight;
 
-            Color[] data = new Color[width * height];
-            for (int x = 0; x < width; x++)
+            var data = new Color[width * height];
+            for (var x = 0; x < width; x++)
+            for (var y = 0; y < height; y++)
             {
-                for (int y = 0; y < height; y++)
-                {
-                    bool traversible = house.isTilePassable(new xTile.Dimensions.Location(x, y), Game1.viewport);
-                    bool placeable = house.isTileLocationTotallyClearAndPlaceable(new Vector2(x, y));
-                    bool isVoid = (!house.isTileOnMap(new Vector2(x, y)) || isTileVoid(house.map, x, y));
-                    bool wall = house.isTileOnWall(x, y);
-                    data[x + (y * width)] = (isVoid ? Color.Black : wall ? Color.Lavender : traversible && placeable ? Color.White : traversible ? Color.LightBlue : placeable ? Color.Red : Color.Black);
-                }
+                var traversible = house.isTilePassable(new xTile.Dimensions.Location(x, y), Game1.viewport);
+                var placeable = house.isTileLocationTotallyClearAndPlaceable(new Vector2(x, y));
+                var isVoid = !house.isTileOnMap(new Vector2(x, y)) || isTileVoid(house.map, x, y);
+                var wall = house.isTileOnWall(x, y);
+                data[x + y * width] = isVoid ? Color.Black :
+                    wall ? Color.Lavender :
+                    traversible && placeable ? Color.White :
+                    traversible ? Color.LightBlue :
+                    placeable ? Color.Red : Color.Black;
             }
 
             drawAStarPath(house, ref data);
@@ -1017,34 +1004,36 @@ namespace FarmHouseRedone
         {
             if (map.GetLayer("Back").Tiles[x, y] == null && map.GetLayer("Buildings") == null)
                 return true;
-            xTile.Tiles.Tile backTile = map.GetLayer("Back").Tiles[x, y];
-            if (backTile != null && ((backTile.TileSheet.ImageSource.Contains("townInterior") && (backTile.TileIndex == 0 || backTile.TileIndex == 48)) || (backTile.TileSheet.ImageSource.Contains("farmhouse_tiles") && backTile.TileIndex == 0)))
-            {
-                return true;
-            }
+            var backTile = map.GetLayer("Back").Tiles[x, y];
+            if (backTile != null &&
+                (backTile.TileSheet.ImageSource.Contains("townInterior") &&
+                 (backTile.TileIndex == 0 || backTile.TileIndex == 48) ||
+                 backTile.TileSheet.ImageSource.Contains("farmhouse_tiles") && backTile.TileIndex == 0)) return true;
             return false;
         }
 
         public static void fixObjectsOnMap(FarmHouse house, int maxDistance = 8)
         {
-            double[,] weights = new double[maxDistance * 2 + 1, maxDistance * 2 + 1];
-            string testOutput = "Weight Map:\n";
-            for(int x = -maxDistance; x <= maxDistance; x++)
+            var weights = new double[maxDistance * 2 + 1, maxDistance * 2 + 1];
+            var testOutput = "Weight Map:\n";
+            for (var x = -maxDistance; x <= maxDistance; x++)
             {
-                for(int y = -maxDistance; y <=maxDistance; y++)
+                for (var y = -maxDistance; y <= maxDistance; y++)
                 {
-                    int weightX = x + maxDistance;
-                    int weightY = y + maxDistance;
-                    double weight = Math.Abs(Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2)));
+                    var weightX = x + maxDistance;
+                    var weightY = y + maxDistance;
+                    var weight = Math.Abs(Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2)));
                     if (weight > 8)
                         weight = -1;
                     weights[weightX, weightY] = weight;
-                    string valueString = weight >= 0 ? weight.ToString() : " ";
+                    var valueString = weight >= 0 ? weight.ToString() : " ";
                     valueString = valueString.Substring(0, Math.Min(4, valueString.Length));
                     testOutput += valueString + "       ".Substring(0, 5 - valueString.Length);
                 }
+
                 testOutput += "\n";
             }
+
             Logger.Log(testOutput);
         }
 
@@ -1061,6 +1050,7 @@ namespace FarmHouseRedone
                 Logger.Log("No spouse room found by the name " + name + "_spouseroom within Maps");
                 Logger.Log(e.Message + e.StackTrace);
             }
+
             return map;
         }
 
@@ -1071,27 +1061,27 @@ namespace FarmHouseRedone
             try
             {
                 map = loader.Load<Map>("Maps/" + name + "_levelthree", ContentSource.GameContent);
-                Logger.Log("Found a map by the name '" + ("Maps/" + name + "_levelthree") + "'!");
+                Logger.Log("Found a map by the name '" + "Maps/" + name + "_levelthree" + "'!");
             }
             catch (Microsoft.Xna.Framework.Content.ContentLoadException)
             {
                 //No map found.
             }
+
             //Next try loading from the mod directory, for the default cellar map
             try
             {
                 map = loader.Load<Map>("assets/maps/" + name + "_levelthree.tbin", ContentSource.ModFolder);
-                Logger.Log("Found packaged default map by the name '" + ("assets/maps/" + name + "_levelthree") + "'");
+                Logger.Log("Found packaged default map by the name '" + "assets/maps/" + name + "_levelthree" + "'");
             }
             catch (Microsoft.Xna.Framework.Content.ContentLoadException e)
             {
                 Logger.Log("No upgrade map found by the name " + name + "_levelthree within assets/maps/");
                 Logger.Log(e.Message + e.StackTrace);
             }
-            if(map == null)
-            {
+
+            if (map == null)
                 Logger.Log("No level three upgrade map could be found by the name '" + name + "_levelthree'!");
-            }
             return map;
         }
 
@@ -1200,47 +1190,41 @@ namespace FarmHouseRedone
 
         //Stolen (with explicit permission) from original author Bwdy
         //https://github.com/bwdymods/SDV-bwdyworks/blob/master/ModUtil.cs
-        public static HashSet<string> GetAllCharacterNames(bool onlyDateable = false, bool onlyVillager = false, StardewValley.GameLocation onlyThisLocation = null)
+        public static HashSet<string> GetAllCharacterNames(bool onlyDateable = false, bool onlyVillager = false,
+            GameLocation onlyThisLocation = null)
         {
-            HashSet<string> characters = new HashSet<string>(); //hashset ensures only unique values exist
+            var characters = new HashSet<string>(); //hashset ensures only unique values exist
             if (onlyThisLocation != null)
             {
                 foreach (var c in onlyThisLocation.characters)
-                {
                     if (!string.IsNullOrWhiteSpace(c.Name))
-                    {
                         if (!onlyVillager || c.isVillager())
-                            if (!onlyDateable || c.datable.Value) characters.Add(c.Name);
-                    }
-                }
+                            if (!onlyDateable || c.datable.Value)
+                                characters.Add(c.Name);
                 return characters; //only checking the one location
             }
+
             //start with NPCDispositions
-            Dictionary<string, string> dictionary = StardewValley.Game1.content.Load<Dictionary<string, string>>("Data\\NPCDispositions");
-            foreach (string s in dictionary.Keys)
+            var dictionary = Game1.content.Load<Dictionary<string, string>>("Data\\NPCDispositions");
+            foreach (var s in dictionary.Keys)
             {
-                var c = StardewValley.Game1.getCharacterFromName(s, onlyVillager);
+                var c = Game1.getCharacterFromName(s, onlyVillager);
                 if (c != null) //simple nullcheck to ensure they weren't removed
-                {
                     if (!onlyDateable || c.datable.Value)
                         if (!string.IsNullOrWhiteSpace(c.Name))
                             characters.Add(c.Name);
-                }
             }
+
             //iterate locations for mod-added NPCs that aren't in the data
-            foreach (var loc in StardewValley.Game1.locations)
-                foreach (var c in loc.characters)
-                {
-                    if (!string.IsNullOrWhiteSpace(c.Name))
-                    {
-                        if (!onlyVillager || c.isVillager())
-                            if (!onlyDateable || c.datable.Value) characters.Add(c.Name);
-                    }
-                }
+            foreach (var loc in Game1.locations)
+            foreach (var c in loc.characters)
+                if (!string.IsNullOrWhiteSpace(c.Name))
+                    if (!onlyVillager || c.isVillager())
+                        if (!onlyDateable || c.datable.Value)
+                            characters.Add(c.Name);
 
             //return the list
             return characters;
         }
-
     }
 }

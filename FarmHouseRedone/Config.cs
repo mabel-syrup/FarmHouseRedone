@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FarmHouseRedone
 {
-    class Config
+    internal class Config
     {
         public bool debug = false;
     }

@@ -18,19 +18,17 @@ namespace FarmHouseRedone.OtherLocations
 
         public static void clearAll()
         {
-            foreach (DecoratableLocation location in states.Keys)
-            {
-                states[location].clear();
-            }
+            foreach (var location in states.Keys) states[location].clear();
         }
 
         public static DecoratableState getState(DecoratableLocation location)
         {
             if (!states.ContainsKey(location))
             {
-                Logger.Log("No state found for " + location.name + "!  (" + location.uniqueName + ")");
+                Logger.Log("No state found for " + location.Name + "!  (" + location.NameOrUniqueName + ")");
                 states[location] = new DecoratableState(location);
             }
+
             return states[location];
         }
     }

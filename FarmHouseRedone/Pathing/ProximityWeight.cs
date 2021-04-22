@@ -8,6 +8,5 @@ namespace FarmHouseRedone.Pathing
 {
     public class ProximityWeight
     {
-
     }
 }

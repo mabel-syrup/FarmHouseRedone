@@ -1,0 +1,10 @@
+/Users/ishanjalan/Documents/GitHub/FarmHouseRedone/FarmHouseRedone/obj/Debug/net452/FarmHouseRedone.csprojAssemblyReference.cache
+/Users/ishanjalan/Documents/GitHub/FarmHouseRedone/FarmHouseRedone/obj/Debug/net452/FarmHouseRedone.AssemblyInfoInputs.cache
+/Users/ishanjalan/Documents/GitHub/FarmHouseRedone/FarmHouseRedone/obj/Debug/net452/FarmHouseRedone.AssemblyInfo.cs
+/Users/ishanjalan/Documents/GitHub/FarmHouseRedone/FarmHouseRedone/obj/Debug/net452/FarmHouseRedone.csproj.CoreCompileInputs.cache
+/Users/ishanjalan/Documents/GitHub/FarmHouseRedone/FarmHouseRedone/bin/Debug/net452/FarmHouseRedone.dll
+/Users/ishanjalan/Documents/GitHub/FarmHouseRedone/FarmHouseRedone/bin/Debug/net452/FarmHouseRedone.pdb
+/Users/ishanjalan/Documents/GitHub/FarmHouseRedone/FarmHouseRedone/bin/Debug/net452/Newtonsoft.Json.dll
+/Users/ishanjalan/Documents/GitHub/FarmHouseRedone/FarmHouseRedone/obj/Debug/net452/FarmHouseRedone.csproj.CopyComplete
+/Users/ishanjalan/Documents/GitHub/FarmHouseRedone/FarmHouseRedone/obj/Debug/net452/FarmHouseRedone.dll
+/Users/ishanjalan/Documents/GitHub/FarmHouseRedone/FarmHouseRedone/obj/Debug/net452/FarmHouseRedone.pdb

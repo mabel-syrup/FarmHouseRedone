@@ -31,15 +31,12 @@ namespace FarmHouseRedone
 
         public void pasteMap(GameLocation location, int pasteX, int pasteY)
         {
-            Dictionary<TileSheet, TileSheet> equivalentSheets = MapUtilities.SheetHelper.getEquivalentSheets(location, patioMap);
-            Vector2 mapSize = getMapSize(patioMap);
-            for(int x = 0; x < mapSize.X; x++)
-            {
-                for(int y = 0; y < mapSize.Y; y++)
-                {
-                    MapUtilities.MapMerger.pasteTile(location.map, patioMap, x, y, pasteX + x, pasteY + y, equivalentSheets);
-                }
-            }
+            var equivalentSheets = MapUtilities.SheetHelper.getEquivalentSheets(location, patioMap);
+            var mapSize = getMapSize(patioMap);
+            for (var x = 0; x < mapSize.X; x++)
+            for (var y = 0; y < mapSize.Y; y++)
+                MapUtilities.MapMerger.pasteTile(location.map, patioMap, x, y, pasteX + x, pasteY + y,
+                    equivalentSheets);
         }
 
         private Vector2 getMapSize(Map map)
@@ -50,25 +47,23 @@ namespace FarmHouseRedone
         public List<FarmerSprite.AnimationFrame> getAnimation()
         {
             Logger.Log("Getting patio animation for Patio_" + whichSpouse + "...");
-            List<FarmerSprite.AnimationFrame> outFrames = new List<FarmerSprite.AnimationFrame>();
-            if(patioMap == null || !patioMap.Properties.ContainsKey("Animation"))
-            {
-                return outFrames;
-            }
-            string[] framesProperty = Utility.cleanup(patioMap.Properties["Animation"]).Split(' ');
-            for(int frame = 0; frame < framesProperty.Length - 1; frame += 2)
-            {
+            var outFrames = new List<FarmerSprite.AnimationFrame>();
+            if (patioMap == null || !patioMap.Properties.ContainsKey("Animation")) return outFrames;
+            var framesProperty = Utility.cleanup(patioMap.Properties["Animation"]).Split(' ');
+            for (var frame = 0; frame < framesProperty.Length - 1; frame += 2)
                 try
                 {
-                    int frameIndex = Convert.ToInt32(framesProperty[frame]);
-                    int frameDuration = Convert.ToInt32(framesProperty[frame + 1]);
+                    var frameIndex = Convert.ToInt32(framesProperty[frame]);
+                    var frameDuration = Convert.ToInt32(framesProperty[frame + 1]);
                     outFrames.Add(new FarmerSprite.AnimationFrame(frameIndex, frameDuration));
                 }
                 catch (FormatException)
                 {
-                    Logger.Log("Animation frame formatting incorrect!  Incorrect frame: index=" + framesProperty[frame] + ", duration=" + framesProperty[frame + 1] + ".\nFull animation string: " + Utility.cleanup(patioMap.Properties["Animation"]));
+                    Logger.Log("Animation frame formatting incorrect!  Incorrect frame: index=" +
+                               framesProperty[frame] + ", duration=" + framesProperty[frame + 1] +
+                               ".\nFull animation string: " + Utility.cleanup(patioMap.Properties["Animation"]));
                 }
-            }
+
             Logger.Log("Added " + outFrames.Count + " frames");
             return outFrames;
         }

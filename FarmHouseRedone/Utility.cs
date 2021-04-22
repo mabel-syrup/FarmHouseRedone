@@ -24,22 +24,24 @@ namespace FarmHouseRedone
 
         public static string cleanup(string dirty)
         {
-            string outString = "";
+            var outString = "";
             Logger.Log("Given " + dirty);
             dirty = dirty.Replace("\n", " ");
             dirty = dirty.Replace("\\n", " ");
             Logger.Log("Line breaks cleaned as " + dirty);
-            for (int index = 0; index < dirty.Length; index++)
+            for (var index = 0; index < dirty.Length; index++)
             {
-                if ((dirty[index] == ' ' && outString.EndsWith(" ")))
+                if (dirty[index] == ' ' && outString.EndsWith(" "))
                     continue;
                 if (spaceEquivalents.Contains(dirty[index]))
                 {
-                    outString += (outString.EndsWith(" ") ? "" : " ");
+                    outString += outString.EndsWith(" ") ? "" : " ";
                     continue;
                 }
+
                 outString += dirty[index];
             }
+
             Logger.Log("Returning " + outString);
             return outString.Trim(' ');
         }

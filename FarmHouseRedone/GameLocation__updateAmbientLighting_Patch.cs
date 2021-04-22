@@ -6,15 +6,13 @@ using System.Threading.Tasks;
 using StardewValley;
 using xTile.Tiles;
 using xTile.ObjectModel;
-using xTile.Dimensions;
 using Microsoft.Xna.Framework;
 using Harmony;
 using System.Reflection.Emit;
 
 namespace FarmHouseRedone
 {
-
-    class GameLocation__updateAmbientLighting_Patch
+    internal class GameLocation__updateAmbientLighting_Patch
     {
         public static bool Prefix(GameLocation __instance)
         {
@@ -24,42 +22,14 @@ namespace FarmHouseRedone
                 Game1.ambientLight = new Color(255, 226, 10);
                 Game1.changeMusicTrack("communityCenter", Game1.currentTrackOverrideable, Game1.MusicContext.Default);
 
-                int ghostCount = (__instance.map.Layers[0].LayerWidth * __instance.map.Layers[0].LayerHeight) / 400;
+                var ghostCount = __instance.map.Layers[0].LayerWidth * __instance.map.Layers[0].LayerHeight / 400;
                 Logger.Log("Adding " + ghostCount + " ghosts");
-                for (int ghostIndex = 0; ghostIndex < ghostCount; ghostIndex++)
-                {
+                for (var ghostIndex = 0; ghostIndex < ghostCount; ghostIndex++)
                     __instance.addCharacterAtRandomLocation(new StardewValley.Monsters.Ghost(Vector2.Zero));
-                }
 
                 return false;
             }
-            return true;
-        }
-    }
 
-    class GameLocation_performAction_Patch
-    {
-        public static bool Prefix(string action, Farmer who, Location tileLocation, bool __result, GameLocation __instance)
-        {
-            if (action == "Mailbox")
-            {
-                Logger.Log(Game1.player.name + " checked the mailbox at " + tileLocation.ToString() + "...");
-                if (__instance is Farm)
-                {
-                    Logger.Log("Mailbox was on the farm...");
-                    Point mailboxPosition = FarmState.getMailboxPosition(Game1.player);
-                    Logger.Log(Game1.player.name + "'s mailbox is at " + mailboxPosition.ToString());
-                    if (tileLocation.X != mailboxPosition.X || tileLocation.Y != mailboxPosition.Y)
-                    {
-                        Logger.Log("Mailbox did not belong to " + Game1.player.name);
-                        return true;
-                    }
-                    Logger.Log("Mailbox belonged to " + Game1.player.name);
-                    __instance.mailbox();
-                    __result = true;
-                    return false;
-                }
-            }
             return true;
         }
     }

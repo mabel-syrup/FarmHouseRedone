@@ -13,11 +13,12 @@ namespace FarmHouseRedone
         public static void init()
         {
             objectIDs = new Dictionary<string, int>();
-            Dictionary<int, string> objectInfo = FarmHouseStates.loader.Load<Dictionary<int, string>>("Data/ObjectInformation", StardewModdingAPI.ContentSource.GameContent);
+            var objectInfo = FarmHouseStates.loader.Load<Dictionary<int, string>>("Data/ObjectInformation",
+                StardewModdingAPI.ContentSource.GameContent);
 
-            foreach(int id in objectInfo.Keys)
+            foreach (var id in objectInfo.Keys)
             {
-                string name = objectInfo[id].Split('/')[0];
+                var name = objectInfo[id].Split('/')[0];
                 objectIDs[name] = id;
             }
         }
@@ -31,11 +32,9 @@ namespace FarmHouseRedone
 
         public static string getName(int id)
         {
-            foreach(string name in objectIDs.Keys)
-            {
+            foreach (var name in objectIDs.Keys)
                 if (objectIDs[name] == id)
                     return name;
-            }
             return "Unknown Object";
         }
     }
