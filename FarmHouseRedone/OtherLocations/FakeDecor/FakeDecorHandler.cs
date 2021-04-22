@@ -17,24 +17,22 @@ namespace FarmHouseRedone.OtherLocations.FakeDecor
         {
             decoratableHosts = new Dictionary<string, DecoratableLocation>();
             //load in all the previously-saved decoratable hosts
-            foreach(GameLocation location in Game1.locations)
-            {
-                if(location.name != null && location.Name.Split('_')[0].Equals("DECORHOST"))
+            foreach (var location in Game1.locations)
+                if (location.Name != null && location.Name.Split('_')[0].Equals("DECORHOST"))
                 {
                     if (!(location is DecoratableLocation))
-                    {
-                        Logger.Log("A decor host was found, but wasn't a DecoratableLocation!  Skipping...", StardewModdingAPI.LogLevel.Warn);
-                    }
+                        Logger.Log("A decor host was found, but wasn't a DecoratableLocation!  Skipping...",
+                            StardewModdingAPI.LogLevel.Warn);
                     Logger.Log("Found a decor host: " + location.Name + ", hosting " + location.Name.Substring(10));
-                    DecoratableLocation host = location as DecoratableLocation;
+                    var host = location as DecoratableLocation;
                     decoratableHosts[location.Name.Substring(10)] = host;
                     //host.wallPaper.OnChange += WallPaper_OnChange;
                     //host.floor.OnChange += Floor_OnChange;
                 }
-            }
+
             Logger.Log("Found " + decoratableHosts.Count + " hosts.  Creating any missing hosts...");
 
-            foreach(GameLocation location in Game1.locations)
+            foreach (var location in Game1.locations)
             {
                 //Decoratable locations don't need a host
                 if (location is DecoratableLocation)
@@ -49,20 +47,19 @@ namespace FarmHouseRedone.OtherLocations.FakeDecor
                     continue;
                 }
 
-                bool needsHost = false;
-                foreach (string propertyKey in location.map.Properties.Keys)
-                {
+                var needsHost = false;
+                foreach (var propertyKey in location.map.Properties.Keys)
                     if (propertyKey.Equals("Walls") || propertyKey.Equals("Floors"))
                     {
                         needsHost = true;
                         break;
                     }
-                }
+
                 if (!needsHost)
                     continue;
                 //This is a location which needs a host, so now we generate one.
 
-                DecoratableLocation host = new DecoratableLocation(location.mapPath, "DECORHOST_" + location.Name);
+                var host = new DecoratableLocation(location.mapPath.Value, "DECORHOST_" + location.Name);
                 //host.wallPaper.OnChange += WallPaper_OnChange;
                 //host.floor.OnChange += Floor_OnChange;
                 Logger.Log("Created host for " + location.Name + ": " + host.Name);
@@ -71,9 +68,9 @@ namespace FarmHouseRedone.OtherLocations.FakeDecor
 
             Logger.Log("Host count is now " + decoratableHosts.Count + " adding any missing hosts to Game1.locations");
 
-            foreach(string key in decoratableHosts.Keys)
+            foreach (var key in decoratableHosts.Keys)
             {
-                DecoratableLocation host = decoratableHosts[key];
+                var host = decoratableHosts[key];
                 if (!Game1.locations.Contains(host))
                 {
                     Logger.Log("Adding " + host.Name + " to locations");
@@ -107,45 +104,41 @@ namespace FarmHouseRedone.OtherLocations.FakeDecor
         {
             if (!decoratableHosts.ContainsValue(location))
                 return null;
-            string nameOfClient = "";
-            foreach (string name in decoratableHosts.Keys)
-            {
+            var nameOfClient = "";
+            foreach (var name in decoratableHosts.Keys)
                 if (decoratableHosts[name] == location)
                 {
                     nameOfClient = name;
                     break;
                 }
-            }
+
             if (nameOfClient == "")
             {
                 Logger.Log("Failed to find client of " + location.Name + "!", StardewModdingAPI.LogLevel.Error);
                 return null;
             }
-            GameLocation client = Game1.getLocationFromName(nameOfClient);
+
+            var client = Game1.getLocationFromName(nameOfClient);
             if (client == null)
             {
-                Logger.Log("No location could be found by the name \"" + nameOfClient + "\"!", StardewModdingAPI.LogLevel.Error);
+                Logger.Log("No location could be found by the name \"" + nameOfClient + "\"!",
+                    StardewModdingAPI.LogLevel.Error);
                 return null;
             }
+
             return client;
         }
 
         public static DecoratableLocation getHost(GameLocation location)
         {
-            if (!decoratableHosts.ContainsKey(location.Name))
-            {
-                return null;
-            }
+            if (!decoratableHosts.ContainsKey(location.Name)) return null;
             return decoratableHosts[location.Name];
         }
 
         public static void updateAsHost(DecoratableLocation location)
         {
-            
-
-            foreach(Rectangle wall in location.getWalls())
+            foreach (var wall in location.getWalls())
             {
-
             }
         }
     }

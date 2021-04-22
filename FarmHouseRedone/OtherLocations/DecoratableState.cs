@@ -41,7 +41,7 @@ namespace FarmHouseRedone.OtherLocations
         {
             clear();
             //Map map = makeMapCopy(house, mapPath);
-            Map map = FarmHouseStates.loader.Load<Map>(mapPath, ContentSource.GameContent);
+            var map = FarmHouseStates.loader.Load<Map>(mapPath, ContentSource.GameContent);
             Logger.Log("Updating walls and floors...");
             PropertyValue floors;
             map.Properties.TryGetValue("Floors", out floors);
@@ -60,87 +60,95 @@ namespace FarmHouseRedone.OtherLocations
 
         public List<Rectangle> getFloors()
         {
-            List<Rectangle> outFloors = new List<Rectangle>();
+            var outFloors = new List<Rectangle>();
 
             floorDictionary.Clear();
             Logger.Log("Getting floor rectangles...");
             if (FloorsData == null)
-                updateFromMapPath(location.mapPath);
+                updateFromMapPath(location.mapPath.Value);
             if (FloorsData != "")
             {
-                string[] floorArray = FloorsData.Split(' ');
-                for (int index = 0; index < floorArray.Length; index += 5)
-                {
+                var floorArray = FloorsData.Split(' ');
+                for (var index = 0; index < floorArray.Length; index += 5)
                     try
                     {
-                        Rectangle rectResult = new Rectangle(Convert.ToInt32(floorArray[index]), Convert.ToInt32(floorArray[index + 1]), Convert.ToInt32(floorArray[index + 3]), Convert.ToInt32(floorArray[index + 4]));
+                        var rectResult = new Rectangle(Convert.ToInt32(floorArray[index]),
+                            Convert.ToInt32(floorArray[index + 1]), Convert.ToInt32(floorArray[index + 3]),
+                            Convert.ToInt32(floorArray[index + 4]));
                         outFloors.Add(rectResult);
                         floorDictionary[rectResult] = floorArray[index + 2];
                     }
                     catch (IndexOutOfRangeException)
                     {
-                        Logger.Log("Partial floor rectangle definition detected! (" + FloorsData.Substring(index) + ")  Floor rectangles must be defined as\nX Y Identifier Width Height\nPlease ensure all floor definitions have exactly these 5 values.", LogLevel.Error);
+                        Logger.Log(
+                            "Partial floor rectangle definition detected! (" + FloorsData.Substring(index) +
+                            ")  Floor rectangles must be defined as\nX Y Identifier Width Height\nPlease ensure all floor definitions have exactly these 5 values.",
+                            LogLevel.Error);
                     }
                     catch (FormatException)
                     {
-                        string errorLocation = "";
-                        for (int errorIndex = index; errorIndex < floorArray.Length && errorIndex - index < 5; errorIndex += 1)
-                        {
-                            errorLocation += floorArray[errorIndex] + " ";
-                        }
-                        Logger.Log("Incorrect floor rectangle format. (" + errorLocation + ")  Floor rectangles must be defined as\nX Y Identifier Width Height\nPlease ensure all floor definitions have exactly these 5 values.", LogLevel.Error);
+                        var errorLocation = "";
+                        for (var errorIndex = index;
+                            errorIndex < floorArray.Length && errorIndex - index < 5;
+                            errorIndex += 1) errorLocation += floorArray[errorIndex] + " ";
+                        Logger.Log(
+                            "Incorrect floor rectangle format. (" + errorLocation +
+                            ")  Floor rectangles must be defined as\nX Y Identifier Width Height\nPlease ensure all floor definitions have exactly these 5 values.",
+                            LogLevel.Error);
                     }
-                }
             }
+
             return outFloors;
         }
 
         public List<Rectangle> getWalls()
         {
-            List<Rectangle> outWalls = new List<Rectangle>();
+            var outWalls = new List<Rectangle>();
 
             wallDictionary.Clear();
             Logger.Log("Getting walls...");
             if (WallsData == null)
-                updateFromMapPath(location.mapPath);
+                updateFromMapPath(location.mapPath.Value);
             if (WallsData != "")
             {
-                string[] wallArray = WallsData.Split(' ');
-                for (int index = 0; index < wallArray.Length; index += 5)
-                {
+                var wallArray = WallsData.Split(' ');
+                for (var index = 0; index < wallArray.Length; index += 5)
                     try
                     {
-                        Rectangle rectResult = new Rectangle(Convert.ToInt32(wallArray[index]), Convert.ToInt32(wallArray[index + 1]), Convert.ToInt32(wallArray[index + 3]), Convert.ToInt32(wallArray[index + 4]));
+                        var rectResult = new Rectangle(Convert.ToInt32(wallArray[index]),
+                            Convert.ToInt32(wallArray[index + 1]), Convert.ToInt32(wallArray[index + 3]),
+                            Convert.ToInt32(wallArray[index + 4]));
                         outWalls.Add(rectResult);
                         wallDictionary[rectResult] = wallArray[index + 2];
                     }
                     catch (IndexOutOfRangeException)
                     {
-                        Logger.Log("Partial wall rectangle definition detected! (" + WallsData.Substring(index) + ")  Wall rectangles must be defined as\nX Y Identifier Width Height\nPlease ensure all wall definitions have exactly these 5 values.", LogLevel.Error);
+                        Logger.Log(
+                            "Partial wall rectangle definition detected! (" + WallsData.Substring(index) +
+                            ")  Wall rectangles must be defined as\nX Y Identifier Width Height\nPlease ensure all wall definitions have exactly these 5 values.",
+                            LogLevel.Error);
                     }
                     catch (FormatException)
                     {
-                        string errorLocation = "";
-                        for (int errorIndex = index; errorIndex < wallArray.Length && errorIndex - index < 5; errorIndex += 1)
-                        {
-                            errorLocation += wallArray[errorIndex] + " ";
-                        }
-                        Logger.Log("Incorrect wall rectangle format. (" + errorLocation + ")  Wall rectangles must be defined as\nX Y Identifier Width Height\nPlease ensure all wall definitions have exactly these 5 values.", LogLevel.Error);
+                        var errorLocation = "";
+                        for (var errorIndex = index;
+                            errorIndex < wallArray.Length && errorIndex - index < 5;
+                            errorIndex += 1) errorLocation += wallArray[errorIndex] + " ";
+                        Logger.Log(
+                            "Incorrect wall rectangle format. (" + errorLocation +
+                            ")  Wall rectangles must be defined as\nX Y Identifier Width Height\nPlease ensure all wall definitions have exactly these 5 values.",
+                            LogLevel.Error);
                     }
-                }
             }
-            string wallString = "Found " + outWalls.Count + " walls: ";
-            foreach(Rectangle wall in outWalls)
-            {
-                wallString += "\n" + wall.ToString();
-            }
+
+            var wallString = "Found " + outWalls.Count + " walls: ";
+            foreach (var wall in outWalls) wallString += "\n" + wall.ToString();
             Logger.Log(wallString);
             return outWalls;
         }
 
         public void updateWallpapers()
         {
-            
         }
     }
 }

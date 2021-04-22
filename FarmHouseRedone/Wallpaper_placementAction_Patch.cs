@@ -12,51 +12,48 @@ using StardewValley.Network;
 
 namespace FarmHouseRedone
 {
-    class Wallpaper_placementAction_Patch
+    internal class Wallpaper_placementAction_Patch
     {
-        internal static bool Prefix(GameLocation location, int x, int y, Farmer who, ref bool __result, Wallpaper __instance)
+        internal static bool Prefix(GameLocation location, int x, int y, Farmer who, ref bool __result,
+            Wallpaper __instance)
         {
             if (who == null)
                 who = Game1.player;
             if (who.currentLocation is DecoratableLocation)
                 return true;
-            DecoratableLocation host = OtherLocations.FakeDecor.FakeDecorHandler.getHost(who.currentLocation);
+            var host = OtherLocations.FakeDecor.FakeDecorHandler.getHost(who.currentLocation);
             if (host == null)
                 return true;
 
             //We have our host now, so we will instead be using it on that host.
 
-            Point point = new Point(x / 64, y / 64);
+            var point = new Point(x / 64, y / 64);
 
-            if ((bool)((NetFieldBase<bool, NetBool>)__instance.isFloor))
+            if (__instance.isFloor.Value)
             {
-                List<Rectangle> floors = host.getFloors();
-                for (int whichRoom = 0; whichRoom < floors.Count; ++whichRoom)
-                {
+                var floors = host.getFloors();
+                for (var whichRoom = 0; whichRoom < floors.Count; ++whichRoom)
                     if (floors[whichRoom].Contains(point))
                     {
-                        host.setFloor((int)((NetFieldBase<int, NetInt>)__instance.parentSheetIndex), whichRoom, true);
+                        host.setFloor(__instance.ParentSheetIndex, whichRoom, true);
                         host.setFloors();
                         location.playSound("coin", NetAudio.SoundContext.Default);
                         __result = true;
                         return false;
                     }
-                }
             }
             else
             {
-                List<Rectangle> walls = host.getWalls();
-                for (int whichRoom = 0; whichRoom < walls.Count; ++whichRoom)
-                {
+                var walls = host.getWalls();
+                for (var whichRoom = 0; whichRoom < walls.Count; ++whichRoom)
                     if (walls[whichRoom].Contains(point))
                     {
-                        host.setWallpaper((int)((NetFieldBase<int, NetInt>)__instance.parentSheetIndex), whichRoom, true);
+                        host.setWallpaper(__instance.ParentSheetIndex, whichRoom, true);
                         host.setWallpapers();
                         location.playSound("coin", NetAudio.SoundContext.Default);
                         __result = true;
                         return false;
                     }
-                }
             }
 
             return true;

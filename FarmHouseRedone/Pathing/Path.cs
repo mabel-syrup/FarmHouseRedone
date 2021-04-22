@@ -31,24 +31,21 @@ namespace FarmHouseRedone.Pathing
 
         public List<Node> FindPath(Vector2 start, Vector2 end)
         {
-            Node startNode = grid.getNode(start);
-            Node endNode = grid.getNode(end);
+            var startNode = grid.getNode(start);
+            var endNode = grid.getNode(end);
 
-            List<Node> openSet = new List<Node>();
-            HashSet<Node> closedSet = new HashSet<Node>();
+            var openSet = new List<Node>();
+            var closedSet = new HashSet<Node>();
 
             openSet.Add(startNode);
 
             while (openSet.Count > 0)
             {
-                Node currentNode = openSet[0];
-                for(int node = 0; node < openSet.Count; node++)
-                {
-                    if(openSet[node].fCost < currentNode.fCost || (openSet[node].fCost == currentNode.fCost && openSet[node].hCost < currentNode.hCost))
-                    {
+                var currentNode = openSet[0];
+                for (var node = 0; node < openSet.Count; node++)
+                    if (openSet[node].fCost < currentNode.fCost || openSet[node].fCost == currentNode.fCost &&
+                        openSet[node].hCost < currentNode.hCost)
                         currentNode = openSet[node];
-                    }
-                }
 
                 openSet.Remove(currentNode);
                 closedSet.Add(currentNode);
@@ -59,12 +56,13 @@ namespace FarmHouseRedone.Pathing
                     return retracePath(startNode, endNode);
                 }
 
-                foreach(Node neighbor in grid.getNeighbors(currentNode))
+                foreach (var neighbor in grid.getNeighbors(currentNode))
                 {
                     if (!neighbor.traversible || closedSet.Contains(neighbor))
                         continue;
-                    int newMoveCost = currentNode.gCost + getDistance(currentNode, neighbor) + (int)(neighbor.weightCost * 10);
-                    if(newMoveCost < neighbor.gCost || !openSet.Contains(neighbor))
+                    var newMoveCost = currentNode.gCost + getDistance(currentNode, neighbor) +
+                                      (int) (neighbor.weightCost * 10);
+                    if (newMoveCost < neighbor.gCost || !openSet.Contains(neighbor))
                     {
                         neighbor.gCost = newMoveCost;
                         neighbor.hCost = getDistance(neighbor, endNode);
@@ -75,26 +73,29 @@ namespace FarmHouseRedone.Pathing
                     }
                 }
             }
-            Logger.Log("Failed to find a path to " + endNode.position.ToString() + "!", StardewModdingAPI.LogLevel.Error);
+
+            Logger.Log("Failed to find a path to " + endNode.position.ToString() + "!",
+                StardewModdingAPI.LogLevel.Error);
             return new List<Node>();
         }
 
         internal List<Node> retracePath(Node start, Node end)
         {
-            List<Node> path = new List<Node>();
-            Node currentNode = end;
-            while(currentNode != start)
+            var path = new List<Node>();
+            var currentNode = end;
+            while (currentNode != start)
             {
                 path.Add(currentNode);
                 currentNode = currentNode.parent;
             }
+
             path.Reverse();
             return path;
         }
 
         public int getDistance(Node a, Node b)
         {
-            return Math.Abs((b.x - a.x) + (b.y - a.y));
+            return Math.Abs(b.x - a.x + (b.y - a.y));
         }
     }
 }

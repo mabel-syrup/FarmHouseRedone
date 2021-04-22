@@ -11,7 +11,6 @@ namespace FarmHouseRedone
 {
     public class FarmHouseState
     {
-        
         public string bedData;
         public string spouseRoomData;
         public string kitchenData;

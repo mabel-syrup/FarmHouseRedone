@@ -28,21 +28,24 @@ namespace FarmHouseRedone
                 description = upgrade["Description"].ToString();
                 cost = new Dictionary<int, int>();
                 moneyCost = 0;
-                foreach(KeyValuePair<string, JToken> item in upgrade["Cost"] as JObject)
+                foreach (var item in upgrade["Cost"] as JObject)
                 {
                     if (item.Key.ToLower() == "g")
                     {
                         moneyCost = Convert.ToInt32(item.Value);
                         continue;
                     }
-                    int id = ObjectIDHelper.getID(item.Key);
+
+                    var id = ObjectIDHelper.getID(item.Key);
                     if (id == -1)
                     {
-                        Logger.Log("Couldn't find the ID for an object named \"" + item.Key + "\"!", StardewModdingAPI.LogLevel.Error);
+                        Logger.Log("Couldn't find the ID for an object named \"" + item.Key + "\"!", LogLevel.Error);
                         continue;
                     }
+
                     cost[id] = Convert.ToInt32(item.Value);
                 }
+
                 map = findMapByName(upgrade["Map"].ToString());
                 if (upgrade.ContainsKey("Marriage"))
                     marriageMap = findMapByName(upgrade["Marriage"].ToString());
@@ -63,44 +66,41 @@ namespace FarmHouseRedone
             try
             {
                 map = FarmHouseStates.loader.Load<Map>("Maps/" + name, ContentSource.GameContent);
-                Logger.Log("Found a map by the name '" + ("Maps/" + name) + "'!");
+                Logger.Log("Found a map by the name '" + "Maps/" + name + "'!");
             }
             catch (Microsoft.Xna.Framework.Content.ContentLoadException)
             {
                 //No map found.
             }
+
             //Next try loading from the mod directory, for the default cellar map
             try
             {
                 map = FarmHouseStates.loader.Load<Map>("assets/maps/" + name + ".tbin", ContentSource.ModFolder);
-                Logger.Log("Found packaged default map by the name '" + ("assets/maps/" + name) + "'");
+                Logger.Log("Found packaged default map by the name '" + "assets/maps/" + name + "'");
             }
             catch (Microsoft.Xna.Framework.Content.ContentLoadException e)
             {
                 Logger.Log("No farmhouse map found by the name " + name + " within assets/maps/");
                 Logger.Log(e.Message + e.StackTrace);
             }
-            if (map == null)
-            {
-                Logger.Log("No farmhouse map could be found by the name '" + name + "'!");
-            }
+
+            if (map == null) Logger.Log("No farmhouse map could be found by the name '" + name + "'!");
             return map;
         }
 
         internal string priceListToString()
         {
-            string outString = "";
-            foreach(int id in cost.Keys)
-            {
-                outString += id + " x " + cost[id] + ", ";
-            }
+            var outString = "";
+            foreach (var id in cost.Keys) outString += id + " x " + cost[id] + ", ";
             outString += moneyCost + "g";
             return outString;
         }
 
         public override string ToString()
         {
-            return "Level " + level + " upgrade:\nDescription: " + description + "\nCost: " + priceListToString() + "\nMap: " + map.Id + " Marriage: " + marriageMap.Id;
+            return "Level " + level + " upgrade:\nDescription: " + description + "\nCost: " + priceListToString() +
+                   "\nMap: " + map.Id + " Marriage: " + marriageMap.Id;
         }
     }
 }

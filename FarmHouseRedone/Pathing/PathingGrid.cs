@@ -27,13 +27,11 @@ namespace FarmHouseRedone.Pathing
 
             grid = new Node[this.width, this.height];
 
-            for(int x = 0; x < this.width; x++)
+            for (var x = 0; x < this.width; x++)
+            for (var y = 0; y < this.height; y++)
             {
-                for(int y = 0; y < this.height; y++)
-                {
-                    bool traversible = location.isTilePassable(new xTile.Dimensions.Location(x, y), Game1.viewport);
-                    grid[x, y] = new Node(new Vector2(x, y), traversible);
-                }
+                var traversible = location.isTilePassable(new xTile.Dimensions.Location(x, y), Game1.viewport);
+                grid[x, y] = new Node(new Vector2(x, y), traversible);
             }
 
             updateWeights();
@@ -41,19 +39,17 @@ namespace FarmHouseRedone.Pathing
 
         public void updateWeights()
         {
-            for(int x = 0; x < width; x++)
+            for (var x = 0; x < width; x++)
+            for (var y = 0; y < height; y++)
             {
-                for(int y = 0; y < height; y++)
-                {
-                    Node node = this.getNode(x, y);
-                    node.weightCost = ClaustrophobiaWeight.getWeight(node, this);
-                }
+                var node = getNode(x, y);
+                node.weightCost = ClaustrophobiaWeight.getWeight(node, this);
             }
         }
 
         public List<Node> getNeighbors(Node node)
         {
-            List<Node> neighbors = new List<Node>();
+            var neighbors = new List<Node>();
 
             //SDV characters do not path with diagonals, so the pathing can only be done in the cardinal directions
             if (node.x - 1 >= 0)
@@ -69,13 +65,13 @@ namespace FarmHouseRedone.Pathing
 
         public Node getNode(Vector2 position)
         {
-            return getNode((int)position.X, (int)position.Y);
+            return getNode((int) position.X, (int) position.Y);
         }
 
         public Node getNode(int x, int y)
         {
             //Logger.Log("Getting node (" + Math.Min(x, width) + ", " + Math.Min(y, height) + ")...");
-            return grid[Math.Min(x, width),Math.Min(y, height)];
+            return grid[Math.Min(x, width), Math.Min(y, height)];
         }
     }
 }

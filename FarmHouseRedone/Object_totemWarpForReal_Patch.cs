@@ -8,14 +8,14 @@ using Microsoft.Xna.Framework;
 
 namespace FarmHouseRedone
 {
-    class Object_totemWarpForReal_Patch
+    internal class Object_totemWarpForReal_Patch
     {
         public static bool Prefix(StardewValley.Object __instance)
         {
-            if(__instance.parentSheetIndex == 688 && FarmState.hasFarmWarpChanged())
+            if (__instance.ParentSheetIndex == 688 && FarmState.hasFarmWarpChanged())
             {
-                Vector2 farmWarp = FarmState.farmWarpLocation;
-                Game1.warpFarmer("Farm", (int)farmWarp.X, (int)farmWarp.Y, false);
+                var farmWarp = FarmState.farmWarpLocation;
+                Game1.warpFarmer("Farm", (int) farmWarp.X, (int) farmWarp.Y, false);
 
                 Game1.fadeToBlackAlpha = 0.99f;
                 Game1.screenGlow = false;
@@ -25,6 +25,7 @@ namespace FarmHouseRedone
 
                 return false;
             }
+
             return true;
         }
     }

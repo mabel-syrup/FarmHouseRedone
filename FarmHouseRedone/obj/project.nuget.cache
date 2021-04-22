@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "rSrep1hmLX+Lp4qBR9XW0ZLmfvS+jCsJ56Zi1GYO5qU7pjsi6WOW9BWRsy9EbGCc1bdKfGlQeH7vdNmmhxdUIg==",
+  "success": true,
+  "projectFilePath": "/Users/ishanjalan/Documents/GitHub/FarmHouseRedone/FarmHouseRedone/FarmHouseRedone.csproj",
+  "expectedPackageFiles": [
+    "/Users/ishanjalan/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512",
+    "/Users/ishanjalan/.nuget/packages/pathoschild.stardew.modbuildconfig/3.3.0/pathoschild.stardew.modbuildconfig.3.3.0.nupkg.sha512"
+  ],
+  "logs": []
+}
