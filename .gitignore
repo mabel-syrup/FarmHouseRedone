@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+*.zip
+/FarmHouseRedone/bin/Debug/Newtonsoft.Json.dll
+/FarmHouseRedone/bin/Debug/Newtonsoft.Json.xml
+/.vs/FarmHouseRedone/v15/Server/sqlite3/db.lock
+/.vs/FarmHouseRedone/v15/Server/sqlite3/storage.ide
+/.vs/FarmHouseRedone/v15/Server/sqlite3/storage.ide-shm
+/.vs/FarmHouseRedone/v15/Server/sqlite3/storage.ide-wal
