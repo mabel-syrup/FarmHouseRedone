@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Locations;
@@ -10,9 +7,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using xTile;
 using xTile.ObjectModel;
-using xTile.Display;
-using Harmony;
 using System.IO;
+using HarmonyLib;
 using Newtonsoft.Json.Linq;
 
 namespace FarmHouseRedone
@@ -32,7 +28,7 @@ namespace FarmHouseRedone
         internal static string modPath;
         internal static IContentHelper loader;
         internal static IReflectionHelper reflector;
-        internal static HarmonyInstance harmony;
+        internal static Harmony harmony;
 
         public static List<LevelNUpgrade> upgrades;
         public static int selectedUpgrade = -1;
@@ -793,7 +789,7 @@ namespace FarmHouseRedone
                 {
                     newLayer.Properties[key] = layer.Properties[key];
                 }
-                newMap.Layers.Add(newLayer);
+                newMap.AddLayer(newLayer);
             }
             foreach(string key in sourceMap.Properties.Keys)
             {
